@@ -14,11 +14,21 @@ interface BoundsService {
     @POST("/bounds")
     fun getBounds(@Part image: MultipartBody.Part): Call<BoundsResponse>
 }
-
-
 ```
 #### Network Call
 ```
+private var service: BoundsService
+
+init {
+    //server is run locally
+    val builder = Retrofit.Builder()
+        .addConverterFactory(GsonConverterFactory.create())
+        .baseUrl("<Server IP Address>:8080/")
+        .build()
+
+    service = builder.create(BoundsService::class.java)
+}
+
 suspend fun getBounds(image: MultipartBody.Part) = suspendCancellableCoroutine<BoundsResponse?> { cont ->
         val call = service.getBounds(image)
         call.enqueue(object: Callback<BoundsResponse> {
