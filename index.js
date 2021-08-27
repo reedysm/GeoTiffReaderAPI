@@ -1,6 +1,7 @@
 const express = require('express');
 const formidable = require('express-formidable');
 const GeoTIFF = require('geotiff');
+var utmObj = require('utm-latlng');
 const { fromUrl, fromUrls, fromArrayBuffer, fromBlob } = GeoTIFF;
 const app = express()
 const PORT = 8080;
@@ -44,15 +45,23 @@ app.post('/bounds', async (req, res) => {
             const upperRightLng = bbox[3]
             const upperRight = [upperRightLat, upperRightLng]
 
+            var utm = new utmObj()
+            var upperLeftLatLng = utm.convertUtmToLatLng(upperLeft[0], upperLeft[1], zone, hemisphere)
+            var upperRightLatLng = utm.convertUtmToLatLng(upperRight[0], upperRight[1], zone, hemisphere)
+            var lowerLeftLatLng = utm.convertUtmToLatLng(lowerLeft[0], lowerLeft[1], zone, hemisphere)
+            var lowerRightLatLng = utm.convertUtmToLatLng(lowerRight[0], lowerRight[1], zone, hemisphere)
+
+    
+
             const output = {message: {
                 height: pixelHeight,
-                window: pixelWidth,
+                width: pixelWidth,
                 hemisphere: hemisphere,
                 zone: zone,
-                upperLeft: upperLeft,
-                upperRight: upperRight,
-                lowerLeft: lowerLeft,
-                lowerRight: lowerRight
+                upperLeft: [upperLeftLatLng.lat, upperLeftLatLng.lng],
+                upperRight: [upperRightLatLng.lat, upperRightLatLng.lng],
+                lowerLeft: [lowerLeftLatLng.lat, lowerLeftLatLng.lng],
+                lowerRight: [lowerRightLatLng.lat, lowerRightLatLng.lng],
             }}
             res.status(200).json(output)
         }   
