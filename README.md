@@ -77,7 +77,7 @@ private suspend fun getBounds(path: String): BoundsResponse? {
         )
         val body = builder.build()
 
-        return BoundsHandler.getBounds(body.part(0))
+        return getBounds(body.part(0))
     }
 ```
   
